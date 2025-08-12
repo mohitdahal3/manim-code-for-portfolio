@@ -1,5 +1,4 @@
 from manim import *
-from math import sin , pi , sqrt , erf
 
 
 text1 = Text("Let's do a simple Experiment:" , font = "Noto Sans")
@@ -54,6 +53,15 @@ text28 = Text("ball.show()" , font="Fira Code" , stroke_color=WHITE , color=WHIT
 
 text29 = Text("and Predict" , font="Nunito" , stroke_color=WHITE , color=WHITE)
 
+text30 = MathTex(r"x=5.4")
+
+text31 = Text("And I" , font="Nunito" , stroke_width=0 , color=WHITE)
+
+text32 = Text("am Mohit Dahal" , font="Nunito" , stroke_color = WHITE , color=WHITE , t2c={"Mohit Dahal" : RED})
+text32[2:].set_stroke(RED)
+
+text33 = Text("I love bringing Physics, Math and Computer Science together." , font="Nunito" , stroke_color = WHITE , color=WHITE , t2c={"Physics" : YELLOW , "Math" : YELLOW , "Computer Science" : YELLOW})
+
 def x(t):
     return (1.2 * t)
 
@@ -103,8 +111,8 @@ class ratio16_9(MovingCameraScene):
         ax = Axes(
             x_range=[x_min, x_max, x_step],
             y_range=[y_min, y_max, y_step],
-            x_length=9,
-            y_length=6,
+            x_length=10,
+            y_length=6.5,
             axis_config={
                 "stroke_width": AXIS_STROKE,
                 "color": WHITE,
@@ -157,6 +165,20 @@ class ratio16_9(MovingCameraScene):
                     )
                 )
 
+            # EXTRA: add vertical line at x_max if not already in ticks
+            if x_max not in x_ticks:
+                lines.append(
+                    DashedLine(
+                        ax.coords_to_point(x_max, y_min),
+                        ax.coords_to_point(x_max, y_max),
+                        dash_length=GRID_DASH_LEN,
+                        dashed_ratio=GRID_DASHED_RATIO,
+                        stroke_width=GRID_STROKE,
+                        color=WHITE,
+                        stroke_opacity=GRID_OPACITY,
+                    )
+                )
+
             # horizontal lines at each y tick
             for yv in y_ticks:
                 start = ax.coords_to_point(x_min, yv)
@@ -164,6 +186,20 @@ class ratio16_9(MovingCameraScene):
                 lines.append(
                     DashedLine(
                         start, end,
+                        dash_length=GRID_DASH_LEN,
+                        dashed_ratio=GRID_DASHED_RATIO,
+                        stroke_width=GRID_STROKE,
+                        color=WHITE,
+                        stroke_opacity=GRID_OPACITY,
+                    )
+                )
+
+            # EXTRA: add horizontal line at y_max if not already in ticks
+            if y_max not in y_ticks:
+                lines.append(
+                    DashedLine(
+                        ax.coords_to_point(x_min, y_max),
+                        ax.coords_to_point(x_max, y_max),
                         dash_length=GRID_DASH_LEN,
                         dashed_ratio=GRID_DASHED_RATIO,
                         stroke_width=GRID_STROKE,
@@ -256,13 +292,14 @@ class ratio16_9(MovingCameraScene):
 
         text29.scale(0.8).next_to(text20 , DOWN , buff=0.1).align_to(text3 , LEFT)
 
-
+        text30.scale(0.4).move_to(ax.c2p(5.5 , -0.3)).set_color(RED)
         
 
         trajectory = always_redraw(lambda : 
             ParametricFunction(lambda t: ax.c2p(x(t) , y(t) + ball_radius) , t_range=[0 , t.get_value()] , color=WHITE , stroke_width = 2)
         )
 
+        text31.scale(0.006).move_to(ax.c2p(5.45 , 0.3))
 
         self.play(Write(text1))
         self.wait(0.5)
@@ -364,7 +401,7 @@ class ratio16_9(MovingCameraScene):
 
 
         self.wait(0.5)
-        self.play(t.animate(run_time = 1).set_value(0) , ball.animate(run_time = 1).shift(LEFT * shift_amount) , FadeIn(grid_group , ax , run_time = 2) , Restore(self.camera.frame , run_time = 1))
+        self.play(t.animate(run_time = 1).set_value(0) , ball.animate(run_time = 1).shift(LEFT * shift_amount) , FadeIn(grid_group , ax , run_time = 1) , Restore(self.camera.frame , run_time = 1))
 
         self.add(trajectory)
 
@@ -383,11 +420,41 @@ class ratio16_9(MovingCameraScene):
 
         self.play(Create(predicted_trajectory))
         self.add(blinker_dot)
-        self.play(Blink(blinker_dot , 0.2 , 0.2 , 2 , False))
+        self.play(AnimationGroup(Blink(blinker_dot , 0.2 , 0.2 , 2 , False) , Write(text30 , run_time = 0.8) , lag_ratio=0.5))
 
-        self.play(t.animate.set_value(4.5))
+        self.play(t.animate.set_value(4.5) , run_time = 1.3)
+
+        self.wait(1.8)
+
+        self.play(self.camera.frame.animate(rate_func = ease_out_sine).scale(0.005).move_to(ax.c2p(5.45 , 0.3)))
+        self.wait(0.4)
+        self.play(FadeIn(text31))
+
+        self.wait()
 
 
+class ratio16_9_p2(Scene):
+    def construct(self):
+        text31.scale(1.2)
+        text32.scale(1.2)
+
+        text_group = VGroup(text31.copy().set_opacity(0.5) , text32.copy().set_opacity(0.5)).arrange(RIGHT)
+
+        text32.move_to(text_group[1])
+
+        text33.scale(0.6).next_to(text_group , DOWN)
+
+        self.add(text31)
+
+        self.wait()
+
+        self.play(AnimationGroup(text31.animate(run_time = 1).move_to(text_group[0]) , Write(text32 , run_time = 2) , lag_ratio=0.5))
+        
+        self.wait()
+
+
+        self.play(Write(text33))
 
 
         self.wait()
+
