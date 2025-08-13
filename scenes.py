@@ -365,7 +365,7 @@ class ratio16_9(MovingCameraScene):
         self.play(Write(text20))
 
         self.wait(0.5)
-        self.play(Restore(self.camera.frame), run_time=1)
+        self.play(Restore(self.camera.frame), FadeOut(VGroup(text3[0:4] , text19[4:] , text20)) , run_time=1)
 
         cursor = Line(color=WHITE , start=[0 , 0.3 , 0] , end=ORIGIN , stroke_width = 2).move_to(text21[0])
         self.play(TypeWithCursor(text21 , time_per_char=0.003 , cursor=cursor))
@@ -389,19 +389,19 @@ class ratio16_9(MovingCameraScene):
 
 
         self.wait(0.5)
-        self.play(Unwrite(VGroup(text21 , text22 , text23 , text24 , text25 , text26 , text27 , text28) , run_time = 1) , self.camera.frame.animate(run_time = 1).scale(1.4).move_to([5, 0, 0]) , FadeOut(cursor , run_time = 0.2))
+        self.play(Unwrite(VGroup(text21 , text22 , text23 , text24 , text25 , text26 , text27 , text28) , run_time = 1) , self.camera.frame.animate(run_time = 1).scale(1.4).move_to([5, 0, 0]) , FadeOut(cursor , run_time = 0.2) , FadeIn(VGroup(text3[0:4] , text19[4:] , text20) , run_time = 1))
 
         self.play(Write(text29))
 
 
         self.wait(0.5)
-        self.play(t.animate(run_time = 1).set_value(0) , ball.animate(run_time = 1).shift(LEFT * shift_amount) , FadeIn(grid_group , ax , run_time = 1) , Restore(self.camera.frame , run_time = 1))
+        self.play(t.animate(run_time = 1).set_value(0) , ball.animate(run_time = 1).shift(LEFT * shift_amount) , FadeIn(grid_group , ax , run_time = 1) , Restore(self.camera.frame , run_time = 1) , FadeOut(VGroup(text3[0:4] , text19[4:] , text20 , text29) , run_time = 1))
 
         self.add(trajectory)
 
 
-        
 
+        self.wait(0.5)
         self.play(t.animate(rate_func = ease_out_sine , run_time = 2).set_value(3.285))
 
 
@@ -802,6 +802,8 @@ class ratio9_16(MovingCameraScene):
         text29.scale(0.7).next_to(text20 , DOWN , buff=0.08).align_to(text3 , LEFT)
         self.play(Write(text29))
 
+        self.wait(0.5)
+
         self.play(t.animate(run_time = 1).set_value(0) , ball.animate(run_time = 1).shift(LEFT * shift_amount) , FadeIn(ax , grid_group , run_time = 1) , VGroup(text20 , text3[0:4] , text19[4:] , text29).animate.shift(DOWN * 2))
 
 
@@ -810,6 +812,8 @@ class ratio9_16(MovingCameraScene):
         )
 
         self.add(trajectory)
+
+        self.wait(0.5)
         self.play(t.animate(rate_func = ease_out_sine , run_time = 2).set_value(3.285))
 
 
