@@ -72,21 +72,19 @@ ball_color = "#E1296FCC"
 ball_radius = 0.3
 
 
-base = Line(start=[-4,-2,0] , end=[4,-2,0] , stroke_width = 1.5 , color=WHITE , stroke_color = WHITE)
-
 
 
 class ratio16_9(MovingCameraScene):
     def construct(self):
-        config.pixel_width = 1920
-        config.pixel_height = 1080
-
         # self.add(NumberPlane())
 
 
         text1.scale(1.2).shift(UP * 0.7)
         text2.next_to(text1 , DOWN , buff=0.5)
         underline = Line(start=text2.get_left() , end=text2.get_right() , buff=0.2 , color=BLUE).next_to(text2 , DOWN , buff=0.05)
+        
+
+        base = Line(start=[-4,-2,0] , end=[4,-2,0] , stroke_width = 1.5 , color=WHITE , stroke_color = WHITE)
         
 
         # -------------------------
@@ -219,10 +217,6 @@ class ratio16_9(MovingCameraScene):
         ax.set_z_index(1)
 
 
-
-
-
-
         ax.shift(-1 * ax.c2p(0,0))
 
         shift_amount = ax.c2p(5.4 , 0)[0]
@@ -299,7 +293,7 @@ class ratio16_9(MovingCameraScene):
             ParametricFunction(lambda t: ax.c2p(x(t) , y(t) + ball_radius) , t_range=[0 , t.get_value()] , color=WHITE , stroke_width = 2)
         )
 
-        text31.scale(0.006).move_to(ax.c2p(5.45 , 0.3))
+        text31.scale(0.006).move_to(ax.c2p(5.45 , ball_radius))
 
         self.play(Write(text1))
         self.wait(0.5)
@@ -426,7 +420,7 @@ class ratio16_9(MovingCameraScene):
 
         self.wait(1.8)
 
-        self.play(self.camera.frame.animate(rate_func = ease_out_sine).scale(0.005).move_to(ax.c2p(5.45 , 0.3)))
+        self.play(self.camera.frame.animate(rate_func = ease_out_sine).scale(0.005).move_to(ax.c2p(5.45 , ball_radius)))
         self.wait(0.4)
         self.play(FadeIn(text31))
 
@@ -458,3 +452,424 @@ class ratio16_9_p2(Scene):
 
         self.wait()
 
+
+class ratio9_16(MovingCameraScene):
+    def construct(self):
+        self.camera.frame_width = 9
+        self.camera.frame_height = 16
+
+        ball_radius = 0.5
+
+        
+
+        text1.scale(0.9).shift(UP * 0.7)
+        text2.scale(1.1).next_to(text1 , DOWN , buff=0.5)
+        underline = Line(start=text2.get_left() , end=text2.get_right() , buff=0.2 , color=BLUE).next_to(text2 , DOWN , buff=0.05)
+
+        base = Line(start=[-4,-2,0] , end=[4,-2,0] , stroke_width = 1.5 , color=WHITE , stroke_color = WHITE)
+
+        # -------------------------
+        # PARAMETERS you provided/tweaked
+        # -------------------------
+        x_min, x_max, x_step = -1, 6, 1
+        y_min, y_max, y_step = -2, 7, 1
+
+        AXIS_STROKE = 1.5           # axis stroke width
+        TICK_SIZE = 0.06            # tick mark length (units)
+        NUM_FONT_SIZE = 20          # small integer label size
+        TIP_WIDTH = 0.14            # tip arrow width
+        TIP_HEIGHT = 0.14           # tip arrow height
+        GRID_DASH_LEN = 0.12
+        GRID_DASHED_RATIO = 0.45
+        GRID_STROKE = 0.95
+        GRID_OPACITY = 0.3
+
+        # -------------------------
+        # AXES (configured)
+        # -------------------------
+        ax = Axes(
+            x_range=[x_min, x_max, x_step],
+            y_range=[y_min, y_max, y_step],
+            x_length=7.7778,
+            y_length=8.75,
+            axis_config={
+                "stroke_width": AXIS_STROKE,
+                "color": WHITE,
+                "tick_size": TICK_SIZE,
+                "tip_width": TIP_WIDTH,
+                "tip_height": TIP_HEIGHT,
+            },
+            x_axis_config={
+                "include_numbers": True,
+                "font_size": NUM_FONT_SIZE,
+                "decimal_number_config": {"num_decimal_places": 0},
+            },
+            y_axis_config={
+                "include_numbers": True,
+                "font_size": NUM_FONT_SIZE,
+                "decimal_number_config": {"num_decimal_places": 0},
+            },
+            tips=True,
+        )
+        ax.set_color(WHITE)
+
+        # Tweak number labels
+        for n in ax.x_axis.numbers:
+            n.set_color(WHITE).scale(0.85)
+        for n in ax.y_axis.numbers:
+            n.set_color(WHITE).scale(0.85)
+
+        # -------------------------
+        # FULL-AXES GRID (covering both positive and negative)
+        # -------------------------
+        grid_group = VGroup()
+
+        def make_full_grid():
+            lines = []
+            x_ticks = ax.x_axis.get_tick_range()
+            y_ticks = ax.y_axis.get_tick_range()
+
+            # vertical lines at each x tick
+            for xv in x_ticks:
+                start = ax.coords_to_point(xv, y_min)
+                end = ax.coords_to_point(xv, y_max)
+                lines.append(
+                    DashedLine(
+                        start, end,
+                        dash_length=GRID_DASH_LEN,
+                        dashed_ratio=GRID_DASHED_RATIO,
+                        stroke_width=GRID_STROKE,
+                        color=WHITE,
+                        stroke_opacity=GRID_OPACITY,
+                    )
+                )
+
+            # EXTRA: add vertical line at x_max if not already in ticks
+            if x_max not in x_ticks:
+                lines.append(
+                    DashedLine(
+                        ax.coords_to_point(x_max, y_min),
+                        ax.coords_to_point(x_max, y_max),
+                        dash_length=GRID_DASH_LEN,
+                        dashed_ratio=GRID_DASHED_RATIO,
+                        stroke_width=GRID_STROKE,
+                        color=WHITE,
+                        stroke_opacity=GRID_OPACITY,
+                    )
+                )
+
+            # horizontal lines at each y tick
+            for yv in y_ticks:
+                start = ax.coords_to_point(x_min, yv)
+                end = ax.coords_to_point(x_max, yv)
+                lines.append(
+                    DashedLine(
+                        start, end,
+                        dash_length=GRID_DASH_LEN,
+                        dashed_ratio=GRID_DASHED_RATIO,
+                        stroke_width=GRID_STROKE,
+                        color=WHITE,
+                        stroke_opacity=GRID_OPACITY,
+                    )
+                )
+
+            # EXTRA: add horizontal line at y_max if not already in ticks
+            if y_max not in y_ticks:
+                lines.append(
+                    DashedLine(
+                        ax.coords_to_point(x_min, y_max),
+                        ax.coords_to_point(x_max, y_max),
+                        dash_length=GRID_DASH_LEN,
+                        dashed_ratio=GRID_DASHED_RATIO,
+                        stroke_width=GRID_STROKE,
+                        color=WHITE,
+                        stroke_opacity=GRID_OPACITY,
+                    )
+                )
+
+            return VGroup(*lines)
+
+        def _grid_updater(mob):
+            mob.become(make_full_grid())
+
+        grid_group.add_updater(_grid_updater)
+        grid_group.become(make_full_grid())
+        grid_group.set_z_index(0)
+        ax.set_z_index(1)
+
+        ax.shift(-1 * ax.c2p(0,0))
+
+        shift_amount = ax.c2p(5.4 , 0)[0]
+
+        ax.shift(base.get_left() + [1,0,0])
+
+        _grid_updater(grid_group)
+
+
+
+        t = ValueTracker(0)
+
+        def give_ball():
+            ball = Circle(radius=ball_radius, stroke_width = 2.6 , stroke_color = ball_color , fill_opacity = 1 , fill_color = BLACK)
+            ball.move_to(ax.c2p(x(t.get_value()) , y(t.get_value())) + [0 , ball_radius , 0])
+
+            return ball
+        
+        ball = always_redraw(give_ball)
+
+        text3.scale(1.07).move_to([-2 , 0.3 , 0])
+        text4.scale(0.7).next_to(text3 , DOWN , buff=0.05).align_to(text3 , LEFT)
+
+        text5.scale(0.6).next_to(text4 , DOWN , buff=1).align_to(text3 , LEFT)
+        text6.scale(0.6).next_to(text5 , DOWN , buff=0.05).align_to(text3 , LEFT)
+        text7.scale(0.6).next_to(text6 , DOWN , buff=0.05).align_to(text3 , LEFT)
+
+        text8.scale(0.6).next_to(text7 , DOWN , buff=1).align_to(text3 , LEFT)
+        text9.scale(0.6).next_to(text8 , DOWN , buff=0.05).align_to(text3 , LEFT)
+        text10.scale(0.6).next_to(text9 , DOWN , buff=0.05).align_to(text3 , LEFT)
+
+        text11.scale(1.07).move_to(text3).align_to(text3 , LEFT)
+
+        text12.scale(0.7).next_to(text11 , DOWN , buff=0.05).align_to(text3 , LEFT)
+
+        text13.scale(0.9).next_to(text12 , DOWN , buff=0.9).align_to(text3 , LEFT)
+        text14.scale(0.9).next_to(text13 , DOWN , buff=0.7).align_to(text3 , LEFT)
+        text15.scale(0.9).next_to(text14 , DOWN , buff=0.7).align_to(text3 , LEFT)
+
+        text16.scale(0.8).move_to([-2 , 2 , 0])
+
+
+        # There was supposed to be an arrow definition here
+        # There was supposed to be a text17 definition here
+
+        text18.scale(0.8).next_to(text16 , RIGHT , buff=2)
+
+        # There was supposed to be an arc definition here
+
+        brace = Brace(VGroup(text13 , text14 , text15) , RIGHT , buff=0.7 , sharpness=1)
+
+        braceEquation.scale(0.8).next_to(brace , RIGHT)
+        braceEquation2.scale(0.8).next_to(brace , RIGHT)
+
+        text19.scale(1.07).move_to(text11).align_to(text3 , LEFT)
+        text20.scale(0.7).next_to(text19 , DOWN , buff=0.05).align_to(text3 , LEFT)
+
+
+        text21.scale(0.5).move_to([-3 , -4.1 , 0])
+        text22.scale(0.5).next_to(text21 , DOWN , buff=0.02).align_to(text21 , LEFT)
+        text23.scale(0.5).next_to(text22 , DOWN , buff=0.02).align_to(text21 , LEFT)
+        text24.scale(0.5).next_to(text23 , DOWN , buff=0.02).align_to(text21 , LEFT)
+        text25.scale(0.5).next_to(text24 , DOWN , buff=0.3).align_to(text21 , LEFT)
+        text26.scale(0.5).next_to(text25 , DOWN , buff=0.3).align_to(text21 , LEFT)
+        text27.scale(0.5).next_to(text26 , DOWN , buff=0.02).align_to(text21 , LEFT)
+        text28.scale(0.5).next_to(text27 , DOWN , buff=0.02).align_to(text21 , LEFT)
+
+        # There was supposed to be a text 29 here
+
+        # there was supposed to be a trajectory here
+
+        
+
+
+
+        self.wait(1.2)
+
+        self.play(Write(text1))
+        self.wait(0.5)
+        self.play(Write(text2) , Create(underline))
+        self.wait(0.5)
+
+        self.play(FadeOut(text1 , run_time = 0.3) , VGroup(text2 , underline).animate.shift(UP * 7.5))
+
+        self.play(Create(base) , Create(ball))
+
+        self.wait(0.5)
+
+        self.play(t.animate.set_value(4.5) , rate_func = linear , run_time = 2)
+
+        self.wait(0.5)
+
+        ############ Lines to remember ############
+
+        ax.set_opacity(0)
+        self.add(ax)
+        self.play(
+            base.animate(run_time = 1).shift(UP * 5),
+            ax.animate(run_time = 1).shift(UP * 5),
+            t.animate(run_time = 1).set_value(0),
+            ball.animate(run_time = 1).shift( UP * 5 + LEFT * shift_amount),
+            Write(text3 , run_time = 1.5)
+        )
+
+        self.remove(ax)
+        ax.set_opacity(1)
+
+        self.play(Write(text4))
+
+        self.wait(0.7)
+        self.play(Write(VGroup(text5 , text6 , text7)))
+        self.play(Write(VGroup(text8 , text9 , text10)))
+
+        self.wait(1)
+        self.play(Unwrite(VGroup(text8 , text9 , text10)) , Unwrite(VGroup(text5 , text6 , text7)) , Unwrite(text4))
+        self.play(ReplacementTransform(text3[4:] , text11[4:]))
+        
+        self.wait(0.5)
+        self.play(Write(text12))
+        
+        self.wait(0.5)
+        self.play(Write(text13))
+        self.play(Write(text14))
+        self.play(Write(text15))
+
+        self.play(Write(text16))
+
+
+        arr = Arrow(start = ball.get_center() , end = ball.get_center() + 0.24 * np.array([1.2 , 4.5 , 0]) , buff=0 , stroke_width=2 , color = GREEN , max_tip_length_to_length_ratio=0.19)
+        arc = Arc(radius = 0.75 , start_angle=0 , angle=1.31 , arc_center=ball.get_center() , stroke_width = 2)
+        text17.scale(0.7).next_to(arr.get_end() , UP , buff=0.15)
+
+
+        self.play(GrowArrow(arr) , FadeIn(text17 , shift=arr.get_end() - arr.get_start()) , run_time = 0.7)
+
+        self.play(Write(text18) , Create(arc))
+
+        self.play(GrowFromCenter(brace))
+        self.play(FadeIn(braceEquation))
+        self.play(TransformMatchingShapes(braceEquation , braceEquation2))
+        
+        self.wait()
+        self.play(
+            Unwrite(text12),
+            Unwrite(text13),
+            Unwrite(text14),
+            Unwrite(text15),
+            Unwrite(text16),
+            Unwrite(text17),
+            Unwrite(text18),
+            Unwrite(braceEquation2),
+            FadeOut(brace),
+            Uncreate(arc),
+            FadeOut(arr)
+        )
+
+
+        self.play(ReplacementTransform(text11[4:] , text19[4:]))
+
+        self.play(Write(text20))
+
+        self.wait(0.5)
+
+
+        ax.set_opacity(0)
+        self.add(ax)
+        self.play(
+            base.animate.shift(DOWN * 4),
+            ax.animate.shift(DOWN * 4),
+            VGroup(text20 , text3[0:4] , text19[4:]).animate.shift(DOWN * 2.7),
+            run_time = 1
+        )
+        self.remove(ax)
+        ax.set_opacity(1)
+
+        _grid_updater(grid_group)
+
+
+        cursor = Line(color=WHITE , start=[0 , 0.4 , 0] , end=ORIGIN , stroke_width = 2).move_to(text21[0])
+        self.play(TypeWithCursor(text21 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text22[0])
+        self.play(TypeWithCursor(text22 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text23[0])
+        self.play(TypeWithCursor(text23 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text24[0])
+        self.play(TypeWithCursor(text24 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text25[0])
+        self.play(TypeWithCursor(text25 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text26[0])
+        self.play(TypeWithCursor(text26 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text27[0])
+        self.play(TypeWithCursor(text27 , time_per_char=0.003 , cursor=cursor))
+        cursor.move_to(text28[0])
+        self.play(TypeWithCursor(text28 , time_per_char=0.003 , cursor=cursor))
+
+        self.wait(0.5)
+        self.play(t.animate(rate_func = linear , run_time = 1.7).set_value(4.5))
+
+
+        self.wait(0.5)
+        self.play(Unwrite(VGroup(text21 , text22 , text23 , text24 , text25 , text26 , text27 , text28) , run_time = 1) , FadeOut(cursor , run_time = 0.2))
+
+        text29.scale(0.7).next_to(text20 , DOWN , buff=0.08).align_to(text3 , LEFT)
+        self.play(Write(text29))
+
+        self.play(t.animate(run_time = 1).set_value(0) , ball.animate(run_time = 1).shift(LEFT * shift_amount) , FadeIn(ax , grid_group , run_time = 1) , VGroup(text20 , text3[0:4] , text19[4:] , text29).animate.shift(DOWN * 2))
+
+
+        trajectory = always_redraw(lambda : 
+            ParametricFunction(lambda t: ax.c2p(x(t) , y(t) + ball_radius) , t_range=[0 , t.get_value()] , color=WHITE , stroke_width = 2)
+        )
+
+        self.add(trajectory)
+        self.play(t.animate(rate_func = ease_out_sine , run_time = 2).set_value(3.285))
+
+
+        predicted_trajectory = always_redraw(lambda : 
+            ParametricFunction(lambda t: ax.c2p(x(t) , y(t) + ball_radius) , t_range=[t.get_value() , 4.5] , color=RED , stroke_width = 1.2)
+        )
+        blinker_dot = Dot(ax.c2p(x(4.5) , y(4.5)) , 0.06 , color=RED_D)
+        text30.scale(0.6).move_to(ax.c2p(x(4.5) + 0.2 , y(4.5) - 0.5 ))
+
+        text31.scale(0.005).move_to(ax.c2p(5.45 , ball_radius))
+
+
+        self.play(Create(predicted_trajectory))
+        self.add(blinker_dot)
+        self.play(AnimationGroup(Blink(blinker_dot , 0.2 , 0.2 , 2 , False) , Write(text30 , run_time = 0.8) , lag_ratio=0.5))
+
+        self.play(t.animate.set_value(4.5) , run_time = 1.3)
+
+        self.wait(1.8)
+
+        self.play(self.camera.frame.animate(rate_func = ease_out_sine).scale(0.005).move_to(ax.c2p(5.45 , ball_radius)))
+        self.wait(0.4)
+        self.play(FadeIn(text31))
+
+
+        self.wait()
+
+
+class ratio9_16_p2(Scene):
+    def construct(self):
+        self.camera.frame_width = 9
+        self.camera.frame_height = 16
+
+        text31.scale(1)
+        text32.scale(1)
+
+
+
+        text_group = VGroup(text31.copy().set_opacity(0.5) , text32.copy().set_opacity(0.5)).arrange(RIGHT)
+
+        text32.move_to(text_group[1])
+
+        text33P1 = Text("I love bringing Physics, Math and Computer Science" , font="Nunito" , stroke_color = WHITE , color=WHITE , t2c={"Physics" : YELLOW , "Math" : YELLOW , "Computer Science" : YELLOW})
+        text33P2 = Text("together." , font="Nunito" , stroke_color = WHITE , color=WHITE)
+
+        text33 = VGroup(text33P1 , text33P2)
+        text33.arrange(DOWN)
+
+        text33.scale(0.5).next_to(text_group , DOWN , buff=0.4)
+
+        self.add(text31)
+
+        self.wait()
+
+        self.play(AnimationGroup(text31.animate(run_time = 1).move_to(text_group[0]) , Write(text32 , run_time = 2) , lag_ratio=0.5))
+        
+        self.wait()
+
+
+        self.play(Write(text33))
+
+
+        self.wait()
